@@ -1,0 +1,16 @@
+# init.recovery.mksh.rc
+#
+# WHY THIS FILE EXISTS (do not delete)
+# -----------------------------------
+# TWRP-11's system/etc/init/hw/init.rc contains:
+#     import /init.recovery.mksh.rc
+# A missing import target is a FATAL parse error in AOSP init: init aborts,
+# the kernel panics and the bootloader watchdog resets -> boot loop.
+#
+# TW_EXCLUDE_BASH := true is set in BoardConfig.mk, so this ramdisk has no
+# mksh/bash and this file must stay EMPTY. If you ever set
+# TW_EXCLUDE_BASH := false, restore the upstream body, which is:
+#
+#     on fs
+#         chmod 0755 /system/bin/sh
+#         chmod 0755 /system/bin/mksh

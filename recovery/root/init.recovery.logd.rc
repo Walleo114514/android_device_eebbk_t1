@@ -1,0 +1,21 @@
+# init.recovery.logd.rc
+#
+# WHY THIS FILE EXISTS (do not delete)
+# -----------------------------------
+# TWRP-11's system/etc/init/hw/init.rc contains:
+#     import /init.recovery.logd.rc
+# and AOSP init's parser treats a failed `import` of a *file* as a FATAL parse
+# error -> init aborts -> kernel panic ("Attempted to kill init!") -> the
+# bootloader watchdog resets after ~8 s -> infinite boot loop / fastboot.
+# (The init binary carries the string "Could not import directory '%s'" and
+#  Parser::ParseConfig() calls init.abort() when an import cannot be read.)
+#
+# On the minimal TWRP manifest (platform_manifest_twrp_aosp / twrp-11) used by
+# .github/workflows/build-twrp.yml, TWRP never ships this file, so the import
+# dangles and recovery can never start. We satisfy it here.
+#
+# The full AOSP version of this file starts a `logd` service. That binary is
+# deliberately NOT in this recovery ramdisk (TWRP does its own logging), so the
+# body is intentionally empty: an empty .rc is valid and adds no behaviour.
+# If you later add system/bin/logd to TW_RECOVERY_INCLUDE_PACKAGES, put the
+# real service definition here.

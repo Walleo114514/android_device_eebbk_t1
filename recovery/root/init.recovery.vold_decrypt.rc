@@ -1,0 +1,19 @@
+# init.recovery.vold_decrypt.rc
+#
+# WHY THIS FILE EXISTS (do not delete)
+# -----------------------------------
+# TWRP-11's system/etc/init/hw/init.rc contains:
+#     import /init.recovery.vold_decrypt.rc
+# A missing import target is a FATAL parse error in AOSP init -> init aborts ->
+# kernel panic -> bootloader watchdog reset -> boot loop.
+#
+# The upstream body starts `vold` for metadata/FBE decryption. This device uses
+# Qualcomm wrappedkey_v0 (TEE/keymaster backed), which TWRP cannot service, and
+# system/bin/vold is not part of this minimal recovery ramdisk, so the file is
+# intentionally empty.
+#
+# NOTE: BoardConfig.mk sets TW_INCLUDE_CRYPTO := true,
+# TW_INCLUDE_CRYPTO_FBE := true and TW_INCLUDE_FBE_METADATA_DECRYPT := true.
+# Those flags make TWRP *attempt* decrypt; they do NOT put vold in the ramdisk.
+# If you ever want real vold-based decrypt, add the vold service (and binary)
+# here. Until then, use "Format Data" / disable encryption from TWRP.

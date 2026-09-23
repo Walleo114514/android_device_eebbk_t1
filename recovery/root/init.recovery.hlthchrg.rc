@@ -1,0 +1,20 @@
+# charger for Android 8.0 and up
+#
+# NOTE: nothing parses this file. TWRP-11's system/etc/init/hw/init.rc does not
+# `import` it, and AOSP init only auto-scans /system/etc/init/ and
+# /vendor/etc/init/ - not the ramdisk root. The stock recovery behaves the same
+# way (its init.rc does not import it either).
+#
+# So this `service charger` entry is dead code on both TWRP and stock, and the
+# `/charger` path (which does not exist in this ramdisk - the binary is at
+# /system/bin/charger) cannot cause a boot failure. We ship the file byte-for-
+# byte as TWRP generates it and do NOT "fix" the path here, because that would
+# change nothing while making the tree harder to reason about.
+#
+# If you ever want off-mode charging you must BOTH:
+#   1. add `import /init.recovery.hlthchrg.rc` to init.rc, and
+#   2. provide /charger (e.g. a symlink to /system/bin/charger).
+
+service charger /charger -r
+    critical
+    seclabel u:r:charger:s0

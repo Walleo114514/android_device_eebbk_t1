@@ -1,0 +1,29 @@
+# init.recovery.qcom.rc — adapted from stock recovery.img for TWRP
+# Keep the stock behaviour (backlight, usb controller, bootdevice symlink) and add
+# TWRP-friendly tweaks. /vendor and /system are mounted later by TWRP.
+
+on init
+    write /sys/class/backlight/panel0-backlight/brightness 200
+    setprop sys.usb.configfs 1
+    # TWRP
+    setprop ro.twrp.version ${ro.twrp.version}
+    mkdir /data 0771 system system
+    mkdir /cache 0770 system cache
+
+on property:ro.boot.usbcontroller=*
+    setprop sys.usb.controller ${ro.boot.usbcontroller}
+    write /sys/class/udc/${ro.boot.usbcontroller}/device/../mode peripheral
+
+on fs
+    wait /dev/block/platform/soc/${ro.boot.bootdevice}
+    symlink /dev/block/platform/soc/${ro.boot.bootdevice} /dev/block/bootdevice
+
+# Let TWRP find the by-name links early (super / logical partitions need this)
+on early-init
+    symlink /dev/block/platform/soc/1d84000.ufshc /dev/block/bootdevice_ufs
+    symlink /dev/block/platform/soc/8804000.sdhci /dev/block/bootdevice_sd
+
+on property:sys.usb.config=mtp,adb
+    write /sys/class/android_usb/android0/enable 0
+    write /sys/class/android_usb/android0/functions mtp,adb
+    write /sys/class/android_usb/android0/enable 1

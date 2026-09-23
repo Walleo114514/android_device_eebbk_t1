@@ -1,0 +1,24 @@
+# init.recovery.usb.rc
+#
+# WHY THIS FILE EXISTS (do not delete)
+# -----------------------------------
+# TWRP-11's system/etc/init/hw/init.rc contains:
+#     import /init.recovery.usb.rc
+# and AOSP init's parser treats an unreadable `import` as a FATAL error and
+# calls init.abort(). The result is: init aborts -> kernel panic
+# ("Attempted to kill init!") -> bootloader watchdog resets after ~8 s ->
+# endless reboot loop / fastboot.
+#
+# WHY THE BODY IS EMPTY
+# ---------------------
+# BoardConfig.mk sets TW_EXCLUDE_DEFAULT_USB_INIT := true, which means TWRP
+# deliberately does NOT ship its own USB config for this device. Putting an
+# AOSP adbd recipe here would fight TWRP's own USB handling (TWRP configures
+# the gadget from userspace via android.hardware.usb.gadget).
+#
+# So: satisfy the import with an empty file. An empty .rc is valid and adds
+# zero behaviour.
+#
+# If you later WANT TWRP's own USB init, flip
+#     TW_EXCLUDE_DEFAULT_USB_INIT := false
+# in BoardConfig.mk, delete this file, and let TWRP's copy through instead.

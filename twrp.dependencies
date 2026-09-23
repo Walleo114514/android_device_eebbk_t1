@@ -1,0 +1,3 @@
+# Device dependencies for TWRP "Sync Device Dependencies" step.
+# 本设备树不需要任何额外仓库（内核/DTB/DTBO 都已 prebuilt 在 prebuilt/ 目录里）。
+# 保持为空即可，convert.sh 会生成一个空的 roomservice.xml。

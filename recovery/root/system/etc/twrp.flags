@@ -1,0 +1,17 @@
+# TWRP extra flags — 小天才 T1
+# <mount point>  <fstype>  flags=...
+/data       f2fs  flags=display="Data";wipeingui;mounttodecrypt;backup=1;flashimg=1
+/cache      ext4  flags=display="Cache";wipeingui;backup=1
+/metadata   ext4  flags=display="Metadata";backup=0
+/persist    ext4  flags=display="Persist";backup=1;flashimg=1
+/system     ext4  flags=display="System";backup=1;flashimg=1;mounttodecrypt
+/system_ext ext4  flags=display="System Ext";backup=1;flashimg=1
+/vendor     ext4  flags=display="Vendor";backup=1;flashimg=1
+/product    ext4  flags=display="Product";backup=1;flashimg=1
+/boot       emmc  flags=display="Boot";backup=1;flashimg=1
+/recovery   emmc  flags=display="Recovery";backup=1;flashimg=1
+/dtbo       emmc  flags=display="Dtbo";backup=1;flashimg=1
+/vbmeta     emmc  flags=display="Vbmeta";backup=1;flashimg=1
+/super      emmc  flags=display="Super";backup=0;flashimg=1
+/external_sd vfat flags=display="MicroSD";storage;wipeingui;removable;backup=1
+/usb-otg    vfat  flags=display="USB OTG";storage;wipeingui;removable;backup=1

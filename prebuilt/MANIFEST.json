@@ -1,0 +1,14 @@
+{
+  "kernel": {
+    "size": 14842592,
+    "sha256": "9a5216ff7b9d376446a621181c0dd177ba18dc208ee188b9c4dfcf496d141571"
+  },
+  "dtb.img": {
+    "size": 969312,
+    "sha256": "2cfab3c837dc8f1b0044ca3977ab8713f7d5f4ae5a8935a5df9d76ef4eb495bc"
+  },
+  "dtbo.img": {
+    "size": 1265674,
+    "sha256": "42cbec0a9b5d9cee95f4154d4d5d86eaac0e06aff499b46eecc67ceb25e200a1"
+  }
+}
