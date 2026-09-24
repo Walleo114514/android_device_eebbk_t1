@@ -135,8 +135,50 @@ BOARD_USERDATAIMAGE_FILE_SYSTEM_TYPE := f2fs
 #BOARD_QTI_DYNAMIC_PARTITIONS_PARTITION_LIST := system system_ext product vendor
 
 # ---------------- AVB ----------------
-# Bootloader is unlocked -> we do NOT re-sign. Do not enable AVB in the TWRP build.
-BOARD_AVB_ENABLE := false
+# ★ 开启 AVB —— 对齐唯一"能过 BL"的基准镜像 out/twrp_fix_small_avb.img ★
+#
+# 实测逐字节对比（tools/diff_vs_baseline.py）显示，我们的构建与那个能过 BL 的
+# 基准之间，**唯一的实质结构差异**就是 AVB：
+#
+#   A（我们的，BOARD_AVB_ENABLE=false）
+#       尾部没有 AVBf；全镜像找不到任何 AVB0
+#   B（能过 BL 的基准）
+#       尾部 @0x5ffffc0 有 AVBf footer
+#       且 @0x1854000 (= 25 509 888) 内嵌着完整的 AVB0 vbmeta 结构
+#       —— 正是 footer 里 vbmeta_offset 指向的位置
+#
+# ABL 读 AVB footer 后会按 vbmeta_offset 去读 vbmeta 结构。B 提供了一个它能
+# 正确解析的内嵌结构；A 什么都没有。这就是差别。
+#
+# 所以必须让**构建自己产出**这个结构（不能手工塞原厂 footer：我们的 ramdisk
+# 更大，footer/vbmeta 的位置会随之改变，必须由 avbtool 重新计算）。
+#
+# 参数照搬同 SoC 的 EEBBK S6 TWRP 树（device/eebbk/sm6150）：
+#     BOARD_AVB_ENABLE := true
+#     BOARD_AVB_RECOVERY_KEY_PATH := external/avb/test/data/testkey_rsa4096.pem
+#     BOARD_AVB_RECOVERY_ALGORITHM := SHA256_RSA4096
+#     BOARD_AVB_RECOVERY_ROLLBACK_INDEX := 1
+#     BOARD_AVB_RECOVERY_ROLLBACK_INDEX_LOCATION := 1
+#
+# 副作用（都是我们要的）：
+#   1) 构建会把 recovery.img pad 到分区大小 100663296（我们手工 pad 过，
+#      但由构建做更可靠）
+#   2) 会在分区尾写出合法的 AVB footer + 内嵌 vbmeta
+#
+# 注意：这里**不设** BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 3。
+# S6 写了这一条，但 AOSP avbtool 把 HASHTREE_DISABLED|VERIFICATION_DISABLED
+# (0x3) 判定为非法组合；我们保持默认 flags=0。
+BOARD_AVB_ENABLE := true
+BOARD_AVB_RECOVERY_KEY_PATH := external/avb/test/data/testkey_rsa4096.pem
+BOARD_AVB_RECOVERY_ALGORITHM := SHA256_RSA4096
+BOARD_AVB_RECOVERY_ROLLBACK_INDEX := 1
+BOARD_AVB_RECOVERY_ROLLBACK_INDEX_LOCATION := 1
+# boot/vbmeta 也用同一把测试密钥，避免只有 recovery 单独启用时参数不完整
+BOARD_AVB_KEY_PATH := external/avb/test/data/testkey_rsa4096.pem
+BOARD_AVB_ALGORITHM := SHA256_RSA4096
+BOARD_AVB_ROLLBACK_INDEX := 1
+# 不要再手工 pad：BOARD_AVB_ENABLE=true 时构建自己会 pad 到分区大小
+# （手工 pad 过再让 avbtool 加 footer 会得到错位的结构）
 
 # ---------------- Recovery ----------------
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery/root/system/etc/recovery.fstab
